@@ -1,0 +1,52 @@
+
+    {% extends 'base.html' %}
+
+    {% block title %}Написать юзерам{% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <h1 class="mt-5">Написать юзерам</h1>
+        {% if status %}
+            <div class="alert alert-danger" role="alert">
+                {{ status }}
+            </div>
+        {% endif %}
+        <form method="post" action="{{ url_for('write_to_users') }}"  enctype="multipart/form-data">
+          {{ form.hidden_tag() }}
+          {{ form.csrf_token }}
+          <div class="form-check">
+              {{ form.paid_year(class="form-check-input") }}
+              <label class="form-check-label" for="{{ form.paid_year.id }}">Платный (на год)</label>
+          </div>
+          <div class="form-check">
+              {{ form.paid_monthly(class="form-check-input") }}
+              <label class="form-check-label" for="{{ form.paid_monthly.id }}">Платный (на месяц)</label>
+          </div>
+          <div class="form-check">
+              {{ form.trial(class="form-check-input") }}
+              <label class="form-check-label" for="{{ form.trial.id }}">Триал</label>
+          </div>
+          <div class="form-check">
+              {{ form.promo(class="form-check-input") }}
+              <label class="form-check-label" for="{{ form.promo.id }}">Промо</label>
+          </div>
+          <div class="form-check">
+              {{ form.free(class="form-check-input") }}
+              <label class="form-check-label" for="{{ form.free.id }}">Бесплатный</label>
+          </div>
+          <br>
+          <div class="form-group">
+            {{ form.image.label }}
+            {{ form.image(class="form-control") }}
+        </div>
+          <div class="form-group">
+            <label for="{{ form.msg.id }}">Сообщение:</label>
+            {{ form.msg(class="form-control") }}
+        </div>
+        <br>
+          <button type="submit" class="btn btn-primary">Отправить</button>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% endblock %}

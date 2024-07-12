@@ -1,0 +1,56 @@
+
+    {% extends 'base.html' %}
+
+    {% block title %}Оплаты юзеров{% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <h1 class="mt-5">Оплаты юзеров</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Заплачено в сумме</th>
+                    <th>Уникальных заплативших юзеров</th>
+                    <th>Тариф за месяц</th>
+                    <th>Тариф за год</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ data.total_payments_sum }}$</td>
+                    <td>{{ data.unique_users_count }}</td>
+                    <td>{{ data.paid_20_count }}</td>
+                    <td>{{ data.paid_200_count }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>PAYMENT ID</th>
+                <th>Telegram ID</th>
+                <th>User name</th>
+                <th>Amount</th>
+                <th>REF ID</th>
+                <th>DATE</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in data.payments_list %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.telegram_id }}</td>
+                <td>{{ user.user_name }}</td>
+                <td>{{ user.amount }}$</td>
+                <td>{{ user.ref_id }}</td>
+                <td>{{ user.paid_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    </div>
+    {% endblock %}
+    

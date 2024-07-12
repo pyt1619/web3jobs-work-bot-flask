@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика пользователей{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container">
+    <h1 class="mt-5">Статистика пользователей</h1>
+    <div class="row mt-3">
+        <div class="col">
+            <div id="summary" class="text-center mb-3"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="dateRange">Выберите диапазон дат:</label>
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <button class="btn btn-primary" onclick="updateChart()">Обновить график</button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <canvas id="myChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myChart = null;
+
+    // Функция для построения графика
+    function buildChart(data) {
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        const labels = data.map(entry => entry.date);
+        const datasets = [
+            { label: 'No Paid', data: data.map(entry => entry.no_paid) },
+            { label: 'Free', data: data.map(entry => entry.free) },
+            { label: 'Promo', data: data.map(entry => entry.promo) },
+            { label: 'Trial', data: data.map(entry => entry.trial) },
+            { label: 'Paid', data: data.map(entry => entry.paid) }
+        ];
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true
+                    }
+                }
+            }
+        });
+
+        // Подсчет суммы для каждого пункта за выбранный диапазон дат
+        const sum = {
+            'No Paid': data.reduce((total, entry) => total + entry.no_paid, 0),
+            'Free': data.reduce((total, entry) => total + entry.free, 0),
+            'Promo': data.reduce((total, entry) => total + entry.promo, 0),
+            'Trial': data.reduce((total, entry) => total + entry.trial, 0),
+            'Paid': data.reduce((total, entry) => total + entry.paid, 0)
+        };
+
+        // Вывод суммарного числа над графиком
+        const summaryElement = document.getElementById('summary');
+        summaryElement.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Суммарное число за выбранный диапазон дат:</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><i class="fas fa-chart-line"></i> No Paid: ${sum['No Paid']}</li>
+                        <li class="list-inline-item"><i class="fas fa-user-plus"></i> Free: ${sum['Free']}</li>
+                        <li class="list-inline-item"><i class="fas fa-retweet"></i> Promo: ${sum['Promo']}</li>
+                        <li class="list-inline-item"><i class="fas fa-user-check"></i> Trial: ${sum['Trial']}</li>
+                        <li class="list-inline-item"><i class="fas fa-user-check"></i> Paid: ${sum['Paid']}</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+    }
+
+    // Функция для обновления графика с новым диапазоном дат
+    function updateChart() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        // Отправляем запрос на сервер Flask
+        fetch(`/get_user_statistics?start_date=${startDate}&end_date=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            // Обновляем график с полученными данными
+            buildChart(data);
+        })
+        .catch(error => {
+            console.error('Ошибка при получении данных:', error);
+        });
+    }
+    buildChart({{data | tojson}});
+
+</script>
+{% endblock %}

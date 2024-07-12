@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Welcome to the Admin Panel, {{ current_user.username }}</h1>
+</div>
+<h3>Users:</h3>
+<ul>
+    {% for user in data.users %}
+        <li>{{ user }}</li>
+    {% endfor %}
+</ul>
+<h3>Posts:</h3>
+<ul>
+    {% for post in data.posts %}
+        <li>{{ post }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

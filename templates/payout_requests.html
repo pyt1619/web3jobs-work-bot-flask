@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Запросы на выплату{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Запросы на выплату</h1>
+    <p>Общая сумма на вывод {{ data.total_amount }}$</p>
+    <p>Людей ожидающих выплату {{ data.unique_users_count }}</p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Transaction ID</th>
+                <th>Date & Time</th>
+                <th>Amount</th>
+                <th>Wallet</th>
+                <th>Telegram ID</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in data.transactions %}
+            <tr>
+                <td>{{ transaction[0] }}</td> <!-- ID -->
+                <td>{{ transaction[1] }}</td> <!-- Transaction ID -->
+                <td>{{ transaction[2] }}</td> <!-- Date & Time -->
+                <td>{{ transaction[3] }}</td> <!-- Amount -->
+                <td>{{ transaction[4] }}</td> <!-- Wallet -->
+                <td>{{ transaction[5] }}</td> <!-- Telegram ID -->
+                <td>
+                    <button class="edit-transaction btn btn-primary" data-id="{{ transaction[0] }}">Редактировать</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Всплывающее окно -->
+<div id="popup" style="display: none;">
+    <span id="popup-close">&times;</span>
+    <h2>Редактировать транзакцию</h2>
+    <p>Дата и время: <span id="popup-date"></span></p>
+    <p>Сумма: <span id="popup-amount"></span>$</p>
+    <p>Кошелек: <span id="popup-wallet"></span></p>
+    <p>Transaction ID: <span id="tx-id"></span></p>
+    <input type="text" id="transaction-id-input">
+    <button id="send-transaction-id">Отправить</button>
+</div>
+
+<script>
+     // Закрыть всплывающее окно при нажатии на крестик
+    document.getElementById('popup-close').addEventListener('click', function() {
+        document.getElementById('popup').style.display = 'none';
+    });
+    // Показать всплывающее окно при нажатии на кнопку
+    document.querySelectorAll('.edit-transaction').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const transaction = {{ data.transactions|tojson|safe }}.find(t => t[0] === parseInt(id));
+            document.getElementById('popup-date').textContent = transaction[2];
+            document.getElementById('popup-amount').textContent = transaction[3];
+            document.getElementById('popup-wallet').textContent = transaction[4];
+            document.getElementById('tx-id').textContent = transaction[0];
+            document.getElementById('transaction-id-input').value = transaction[1]; // передаем transaction_id
+            document.getElementById('popup').style.display = 'block';
+        });
+    });
+
+    // Отправить данные через API
+    document.getElementById('send-transaction-id').addEventListener('click', function() {
+        const id = document.getElementById('tx-id').childNodes[0].textContent;
+        console.log(id);
+        const transactionId = document.getElementById('transaction-id-input').value;
+
+        // Отправка данных через API (здесь нужно реализовать вашу логику отправки данных)
+        fetch('/update_transaction_id', {
+            method: 'POST',
+            body: JSON.stringify({ id: id, transaction_id: transactionId }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload(); // Перезагрузка страницы после успешной отправки
+            }
+        });
+    });
+</script>
+
+<style>
+    #popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    #popup h2 {
+        margin-top: 0;
+    }
+
+    #popup input[type="text"],
+    #popup button {
+        margin-top: 10px;
+    }
+
+    #popup button {
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #popup button:hover {
+        background-color: #0056b3;
+    }
+
+    #popup-close {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+        font-size: 20px;
+        color: #333;
+    }
+
+    #popup-close:hover {
+        color: #000;
+    }
+</style>
+
+{% endblock %}

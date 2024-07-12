@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Все вакансии{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Все вакансии</h1>
+
+    <!-- Форма поиска по компании -->
+    <form method="get" action="{{ url_for('all_vacancies') }}">
+        {{ category_filter_form.csrf_token }}
+        {{ category_filter_form.company_search.label }} {{ category_filter_form.company_search(class="form-control") }}
+        {{ category_filter_form.title_search.label }} {{ category_filter_form.title_search(class="form-control") }}
+
+        <!-- Поле фильтрации для категории "Customer Support" -->
+            {{ category_filter_form.category_customer_support.label }}
+            {{ category_filter_form.category_customer_support(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Design" -->
+            {{ category_filter_form.category_design.label }}
+            {{ category_filter_form.category_design(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Technical" -->
+            {{ category_filter_form.category_technical.label }}
+            {{ category_filter_form.category_technical(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Finance" -->
+            {{ category_filter_form.category_finance.label }}
+            {{ category_filter_form.category_finance(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Marketing" -->
+            {{ category_filter_form.category_marketing.label }}
+            {{ category_filter_form.category_marketing(class="form-check-input") }}
+        <!-- Поле фильтрации для категории "Non-Tech" -->
+            {{ category_filter_form.category_nontech.label }}
+            {{ category_filter_form.category_nontech(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Operations" -->
+            {{ category_filter_form.category_operations.label }}
+            {{ category_filter_form.category_operations(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Product Surin" -->
+            {{ category_filter_form.category_product_surin.label }}
+            {{ category_filter_form.category_product_surin(class="form-check-input") }}
+
+        <!-- Поле фильтрации для категории "Other" -->
+            {{ category_filter_form.category_other.label }}
+            {{ category_filter_form.category_other(class="form-check-input") }}
+
+        <!-- Кнопка отправки формы -->
+        <br>
+        {{ category_filter_form.submit_category_filter(class="btn btn-primary mt-2") }}
+    </form>
+
+
+    <!-- Таблица с вакансиями -->
+
+</div>
+{% endblock %}

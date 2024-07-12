@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика выплат{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Статистика выплат</h1>
+    <p>Общая сумма на вывод {{ data.total_amount }}$</p>
+    <p>Людей получивших выплату {{ data.unique_users_count }}</p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Transaction ID</th>
+                <th>Date & Time</th>
+                <th>Amount</th>
+                <th>Wallet</th>
+                <th>Telegram ID</th>
+                <th>Transaction url</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in data.transactions %}
+            <tr>
+                <td>{{ transaction[0] }}</td> <!-- ID -->
+                <td>{{ transaction[1] }}</td> <!-- Transaction ID -->
+                <td>{{ transaction[2] }}</td> <!-- Date & Time -->
+                <td>{{ transaction[3] }}</td> <!-- Amount -->
+                <td>{{ transaction[4] }}</td> <!-- Wallet -->
+                <td>{{ transaction[5] }}</td> <!-- Telegram ID -->
+                <td>
+                    <a href="https://tronscan.org/#/transaction/{{transaction[1]}}" target="_blank">ссылка</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

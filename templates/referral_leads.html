@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Лиды рефералка{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-3">
+        <div class="col">
+            <h1 class="mt-5">Лиды рефералка</h1>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <form action="" method="GET" class="form-inline">
+                <div class="form-group" style="width: 50%; float:left">
+                    <input type="text" value="{{search}}" name="telegram_id" id="telegram_id" placeholder="telegram id" class="form-control form-control-sm" style="width: 100%;">
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm ml-2">Найти</button>
+            </form>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Telegram ID</th>
+                <th>REF ID</th>
+                <th>Registration Date</th>
+                <th>Amount</th>
+                <th>User name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in data %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.telegram_id }}</td>
+                <td>{{ user.ref_id }}</td>
+                <td>{{ user.registration_date }}</td>
+                <td>{{ user.total_amount }}$</td>
+                <td>{{ user.user_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

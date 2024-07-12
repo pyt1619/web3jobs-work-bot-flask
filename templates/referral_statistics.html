@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика рефералка{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container">
+    <h1 class="mt-5">Статистика рефералка</h1>
+    <div class="row mt-3">
+        <div class="col">
+            <div id="summary" class="text-center mb-3"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="dateRange">Выберите диапазон дат:</label>
+            <input type="date" id="startDate">
+            <input type="date" id="endDate">
+            <button class="btn btn-primary" onclick="updateChart()">Обновить график</button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <canvas id="myChart" width="800" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    let myChart = null;
+
+    // Функция для построения графика
+    function buildChart(data) {
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        const labels = data.map(entry => entry.date);
+        const datasets = [
+            { label: 'Выручка', data: data.map(entry => entry.revenue) },
+            { label: 'Новые пользователи', data: data.map(entry => entry.click) },
+            { label: 'Новые рефералы', data: data.map(entry => entry.newReferrals) },
+            { label: 'Новые клиенты', data: data.map(entry => entry.newCustomers) }
+        ];
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true
+                    }
+                }
+            }
+        });
+
+        // Подсчет суммы для каждого пункта за выбранный диапазон дат
+        const sum = {
+            'Выручка': data.reduce((total, entry) => total + entry.revenue, 0),
+            'Новые пользователи': data.reduce((total, entry) => total + entry.click, 0),
+            'Новые рефералы': data.reduce((total, entry) => total + entry.newReferrals, 0),
+            'Новые клиенты': data.reduce((total, entry) => total + entry.newCustomers, 0)
+        };
+
+        // Вывод суммарного числа над графиком
+        const summaryElement = document.getElementById('summary');
+        summaryElement.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Суммарное число за выбранный диапазон дат:</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><i class="fas fa-chart-line"></i> Выручка: ${sum['Выручка']}</li>
+                        <li class="list-inline-item"><i class="fas fa-user-plus"></i> Новые пользователи: ${sum['Новые пользователи']}</li>
+                        <li class="list-inline-item"><i class="fas fa-retweet"></i> Новые рефералы: ${sum['Новые рефералы']}</li>
+                        <li class="list-inline-item"><i class="fas fa-user-check"></i> Новые клиенты: ${sum['Новые клиенты']}</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+    }
+
+    // Функция для обновления графика с новым диапазоном дат
+    function updateChart() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        // Отправляем запрос на сервер Flask
+        fetch(`/get_referral_statistics?start_date=${startDate}&end_date=${endDate}`)
+        .then(response => response.json())
+        .then(data => {
+            // Обновляем график с полученными данными
+            buildChart(data);
+        })
+        .catch(error => {
+            console.error('Ошибка при получении данных:', error);
+        });
+    }
+    var data = {{ data | tojson }};
+    // Построить исходный график с данными из Flask
+    buildChart(data);
+</script>
+{% endblock %}
